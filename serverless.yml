@@ -4,12 +4,12 @@ provider:
     name: aws
     runtime: nodejs14.x
     stage: dev
-    region: us-west-1
+    region: us-west-2
     environment:
-        DYNAMODB_TABLE_NAME: ${self:custom.postsTableName}
+        DYNAMODB_TABLE_NAME: ${self:custom.postsTableName} # a self var
 
 custom:
-    postsTableName: posts-table-${self:provider.stage}
+    postsTableName: posts-table-${self:provider.stage} # the self var definition
 
 plugins:
     - serverless-iam-roles-per-function

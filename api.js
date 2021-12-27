@@ -140,6 +140,7 @@ const deletePost = async (event) => {
     return response;
 };
 
+// This function is not meant for production use.
 const getAllPosts = async () => {
     const response = { statusCode: 200 };
 

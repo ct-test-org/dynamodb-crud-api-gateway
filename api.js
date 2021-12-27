@@ -21,7 +21,7 @@ const getPost = async (event) => {
         console.log({ Item });
         response.body = JSON.stringify({
             message: "Successfully retrieved post.",
-            data: (Item) ? unmarshall(Item) : {},
+            data: Item ? unmarshall(Item) : {},
             rawData: Item,
         });
     } catch (e) {
@@ -74,15 +74,25 @@ const updatePost = async (event) => {
         const params = {
             TableName: process.env.DYNAMODB_TABLE_NAME,
             Key: marshall({ postId: event.pathParameters.postId }),
-            UpdateExpression: `SET ${objKeys.map((_, index) => `#key${index} = :value${index}`).join(", ")}`,
-            ExpressionAttributeNames: objKeys.reduce((acc, key, index) => ({
-                ...acc,
-                [`#key${index}`]: key,
-            }), {}),
-            ExpressionAttributeValues: marshall(objKeys.reduce((acc, key, index) => ({
-                ...acc,
-                [`:value${index}`]: body[key],
-            }), {})),
+            UpdateExpression: `SET ${objKeys
+                .map((_, index) => `#key${index} = :value${index}`)
+                .join(", ")}`,
+            ExpressionAttributeNames: objKeys.reduce(
+                (acc, key, index) => ({
+                    ...acc,
+                    [`#key${index}`]: key,
+                }),
+                {}
+            ),
+            ExpressionAttributeValues: marshall(
+                objKeys.reduce(
+                    (acc, key, index) => ({
+                        ...acc,
+                        [`:value${index}`]: body[key],
+                    }),
+                    {}
+                )
+            ),
         };
         const updateResult = await db.send(new UpdateItemCommand(params));
 
@@ -134,7 +144,9 @@ const getAllPosts = async () => {
     const response = { statusCode: 200 };
 
     try {
-        const { Items } = await db.send(new ScanCommand({ TableName: process.env.DYNAMODB_TABLE_NAME }));
+        const { Items } = await db.send(
+            new ScanCommand({ TableName: process.env.DYNAMODB_TABLE_NAME })
+        );
 
         response.body = JSON.stringify({
             message: "Successfully retrieved all posts.",
